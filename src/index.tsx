@@ -1,9 +1,9 @@
-import { Global, css } from '@emotion/react';
+import { injectGlobal } from '@emotion/css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 
-const GlobalStyle = css`
+injectGlobal`
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
@@ -21,7 +21,6 @@ const GlobalStyle = css`
 
 ReactDOM.render(
   <React.StrictMode>
-    <Global styles={GlobalStyle} />
     <App />
   </React.StrictMode>,
   document.getElementById('root'),
