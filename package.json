@@ -1,10 +1,15 @@
 {
+  "license": "UNLICENSED",
   "scripts": {
     "start": "snowpack dev",
     "build": "snowpack build",
     "test": "web-test-runner \"src/**/*.test.tsx\"",
-    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
-    "lint": "prettier --check \"src/**/*.{js,jsx,ts,tsx}\""
+    "lint": "yarn lint:eslint && yarn lint:prettier",
+    "lint:eslint": "eslint \"**/*.{ts,tsx}\"",
+    "lint:prettier": "prettier --check \"src/**/*.{js,jsx,ts,tsx,json,md,yml,css,scss}\"",
+    "format": "yarn format:prettier",
+    "format:prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,md,yml,css,scss}\"",
+    "prepare": "husky install"
   },
   "dependencies": {
     "react": "^17.0.2",
@@ -21,8 +26,16 @@
     "@types/react": "^17.0.4",
     "@types/react-dom": "^17.0.3",
     "@types/snowpack-env": "^2.3.3",
+    "@typescript-eslint/eslint-plugin": "^5.2.0",
+    "@typescript-eslint/parser": "^5.2.0",
     "@web/test-runner": "^0.13.3",
     "chai": "^4.3.4",
+    "eslint": "^8.1.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.26.1",
+    "husky": "^7.0.4",
+    "lint-staged": "^11.2.6",
     "prettier": "^2.2.1",
     "snowpack": "^3.3.7",
     "typescript": "^4.2.4"
