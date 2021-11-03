@@ -4,6 +4,10 @@ import ReactDOM from 'react-dom';
 import App from './App';
 
 injectGlobal`
+  * {
+    margin: 0;
+    padding: 0;
+  }
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
