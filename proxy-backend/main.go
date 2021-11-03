@@ -136,7 +136,17 @@ func (client ResasApiClient) requestToPopulationPerYear(prefCode string, cityCod
 	return population, nil
 }
 
+func setupCORS(w *http.ResponseWriter, req *http.Request) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "http://localhost:8080")
+	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+}
+
 func getPrefectureList(w http.ResponseWriter, req *http.Request) {
+	setupCORS(&w, req)
+	if (*req).Method == "OPTIONS" {
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	prefectureList, err := resasApiClient.requestToPrefectures()
 	if err != nil {
@@ -148,8 +158,12 @@ func getPrefectureList(w http.ResponseWriter, req *http.Request) {
 }
 
 func getPopulationPerYear(w http.ResponseWriter, req *http.Request) {
-	queries := req.URL.Query()
+	setupCORS(&w, req)
+	if (*req).Method == "OPTIONS" {
+		return
+	}
 
+	queries := req.URL.Query()
 	prefCode := queries.Get("prefCode")
 	if prefCode == "" {
 		http.Error(w, "prefCode is required", 400)
