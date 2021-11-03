@@ -23,17 +23,42 @@ type PrefecturesResponse struct {
 	} `json:"result"`
 }
 
+type PopulationPerYearResponse struct {
+	Message string `json:"message"`
+	Result  *struct {
+		BoundaryYear int32 `json:"boundaryYear"`
+		Data         []struct {
+			Label string `json:"label"`
+			Data  []struct {
+				Year  int32    `json:"year"`
+				Value int32    `json:"value"`
+				Rate  *float32 `json:"rate"`
+			} `json:"data"`
+		} `json:"data"`
+	} `json:"result"`
+}
+
 type ResasApiClient struct {
 	Endpoint string
 	ApiKey   string
 }
 
-func (client ResasApiClient) requestToPrefectures() (PrefecturesResponse, error) {
+type ResasApiErrorResponse struct {
+	StatusCode  string `json:"statusCode"`
+	Message     string `json:"message"`
+	Description string `json:"description"`
+}
+
+func (e *ResasApiErrorResponse) Error() string {
+	return fmt.Sprintf("statusCode: %s, message: %s, description: %s", e.StatusCode, e.Message, e.Description)
+}
+
+func (client ResasApiClient) requestToPrefectures() (*PrefecturesResponse, error) {
 	path := "/api/v1/prefectures"
 
 	req, err := http.NewRequest("GET", client.Endpoint+path, nil)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	req.Header.Add("Accept", "application/json")
@@ -41,27 +66,110 @@ func (client ResasApiClient) requestToPrefectures() (PrefecturesResponse, error)
 
 	resp, err := (&http.Client{}).Do(req)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	var prefList PrefecturesResponse
+	if resp.StatusCode != 200 {
+		var errorResponse *ResasApiErrorResponse
+		if err := json.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
+			errorResponse = &ResasApiErrorResponse{
+				StatusCode:  fmt.Sprint(resp.StatusCode),
+				Message:     resp.Status,
+				Description: "",
+			}
+			return nil, errorResponse
+		}
+		return nil, errorResponse
+	}
+
+	var prefList *PrefecturesResponse
 	if err := json.NewDecoder(resp.Body).Decode(&prefList); err != nil {
-		log.Fatal("Cannot decode body")
+		return nil, err
 	}
 
 	return prefList, nil
+}
+
+func (client ResasApiClient) requestToPopulationPerYear(prefCode string, cityCode string, addArea string) (*PopulationPerYearResponse, error) {
+	path := "/api/v1/population/composition/perYear"
+
+	req, err := http.NewRequest("GET", client.Endpoint+path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("X-API-KEY", client.ApiKey)
+
+	q := req.URL.Query()
+	q.Add("prefCode", prefCode)
+	q.Add("cityCode", cityCode)
+	if len(addArea) != 0 {
+		log.Println(addArea)
+		q.Add("addArea", addArea)
+	}
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := (&http.Client{}).Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		var errorResponse *ResasApiErrorResponse
+		if err := json.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
+			errorResponse = &ResasApiErrorResponse{
+				StatusCode:  fmt.Sprint(resp.StatusCode),
+				Message:     resp.Status,
+				Description: "",
+			}
+			return nil, errorResponse
+		}
+		return nil, errorResponse
+	}
+
+	var population *PopulationPerYearResponse
+	if err := json.NewDecoder(resp.Body).Decode(&population); err != nil {
+		return nil, err
+	}
+
+	return population, nil
 }
 
 func getPrefectureList(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	prefectureList, err := resasApiClient.requestToPrefectures()
 	if err != nil {
+		log.Println(err)
 		http.Error(w, "Internal Server Error", 503)
+		return
 	}
 	json.NewEncoder(w).Encode(prefectureList)
 }
 
 func getPopulationPerYear(w http.ResponseWriter, req *http.Request) {
+	queries := req.URL.Query()
+
+	prefCode := queries.Get("prefCode")
+	if prefCode == "" {
+		http.Error(w, "prefCode is required", 400)
+		return
+	}
+	cityCode := queries.Get("cityCode")
+	if cityCode == "" {
+		http.Error(w, "cityCode is required", 400)
+		return
+	}
+	addArea := queries.Get("addArea")
+
+	w.Header().Set("Content-Type", "application/json")
+	prefectureList, err := resasApiClient.requestToPopulationPerYear(prefCode, cityCode, addArea)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Internal Server Error", 503)
+		return
+	}
+	json.NewEncoder(w).Encode(prefectureList)
 }
 
 func main() {
