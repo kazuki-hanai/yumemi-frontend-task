@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
+import type { ResasApiContextData } from '../context/ResasApiContext';
 import type {
   PopulationResponse,
   PrefectureMap,
   PrefectureResponse,
 } from '../@types/ResesApi';
+import ENDPOINT from '../constant/endpoint';
 
-const useResasApi = (endpoint: string) => {
+const useResasApiContextValue = (): ResasApiContextData => {
   const [prefectureMap, setPrefectureMap] = useState<PrefectureMap>(new Map());
 
   const setSelectedPrefecture = async (prefCode: number, selected: boolean) => {
@@ -14,8 +16,7 @@ const useResasApi = (endpoint: string) => {
       return;
     }
     prefecture.selected = selected;
-    prefectureMap.set(prefCode, prefecture);
-    setPrefectureMap(prefectureMap);
+    setPrefectureMap((prev) => new Map([...prev, [prefCode, prefecture]]));
 
     if (selected) {
       await fetchPopulation(prefCode);
@@ -30,7 +31,7 @@ const useResasApi = (endpoint: string) => {
     }
 
     const rawPopulation = await fetch(
-      `${endpoint}/population/composition/perYear?prefCode=${prefCode}&cityCode=-`,
+      `${ENDPOINT}/population/composition/perYear?prefCode=${prefCode}&cityCode=-`,
     );
     const populationResponse: PopulationResponse = await rawPopulation.json();
     for (const composition of populationResponse.result.data) {
@@ -38,13 +39,13 @@ const useResasApi = (endpoint: string) => {
         for (const population of composition.data) {
           prefecture.populations.set(population.year, population.value);
         }
-        prefectureMap.set(prefCode, prefecture);
+        setPrefectureMap((prev) => new Map([...prev, [prefCode, prefecture]]));
       }
     }
   };
 
   const fetchPrefectures = async () => {
-    const rawPrefectures = await fetch(`${endpoint}/prefectures`);
+    const rawPrefectures = await fetch(`${ENDPOINT}/prefectures`);
     const prefecturesResponse: PrefectureResponse = await rawPrefectures.json();
 
     const newPrefectureMap = new Map();
@@ -55,15 +56,17 @@ const useResasApi = (endpoint: string) => {
           prefectureMap.get(prefecture.prefCode),
         );
       } else {
-        newPrefectureMap.set(prefecture.prefCode, {
+        const newPrefecture = {
           prefCode: prefecture.prefCode,
           prefName: prefecture.prefName,
           selected: false,
           populations: new Map(),
-        });
+        };
+        setPrefectureMap(
+          (prev) => new Map([...prev, [newPrefecture.prefCode, newPrefecture]]),
+        );
       }
     }
-    setPrefectureMap(newPrefectureMap);
   };
 
   useEffect(() => {
@@ -80,4 +83,4 @@ const useResasApi = (endpoint: string) => {
   };
 };
 
-export default useResasApi;
+export default useResasApiContextValue;
