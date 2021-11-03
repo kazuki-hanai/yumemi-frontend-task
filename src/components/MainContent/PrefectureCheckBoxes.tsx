@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import { css } from '@emotion/css';
-import usePrefectures from '../../hooks/usePrefectures';
+import useResasApi from '../../hooks/useResasApi';
 
 const PrefectureCheckBoxesStyle = css`
   width: 100%;
@@ -17,18 +17,25 @@ const PrefectureListStyle = css`
 
 const PrefectureCheckBoxes = () => {
   const endpoint = 'http://localhost:8090';
-  const prefectures = usePrefectures(endpoint);
+  const { prefectureMap, setSelectedPrefecture } = useResasApi(endpoint);
+
+  const handleCheckBox = (event: ChangeEvent<HTMLInputElement>) => {
+    const prefCode = event.target.value;
+    const checked = event.target.checked;
+    setSelectedPrefecture(parseInt(prefCode), checked);
+  };
 
   const CheckBoxes = [];
-  for (const prefecture of prefectures) {
+  for (const [prefCode, prefecture] of prefectureMap) {
     CheckBoxes.push(
-      <li className={PrefectureListStyle}>
-        <label htmlFor={`prefecture-${prefecture.prefCode}`}>
+      <li key={prefCode} className={PrefectureListStyle}>
+        <label htmlFor={`prefecture-${prefCode}`}>
           {prefecture.prefName}
           <input
             type="checkbox"
-            id={`prefecture-${prefecture.prefCode}`}
-            value={prefecture.prefCode}
+            id={`prefecture-${prefCode}`}
+            value={prefCode}
+            onChange={handleCheckBox}
           />
         </label>
       </li>,
