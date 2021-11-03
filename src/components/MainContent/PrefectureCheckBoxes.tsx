@@ -1,6 +1,6 @@
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, useContext } from 'react';
 import { css } from '@emotion/css';
-import useResasApi from '../../hooks/useResasApi';
+import { ResasApiContext } from '../../context/ResasApiContext';
 
 const PrefectureCheckBoxesStyle = css`
   width: 100%;
@@ -16,13 +16,12 @@ const PrefectureListStyle = css`
 `;
 
 const PrefectureCheckBoxes = () => {
-  const endpoint = 'http://localhost:8090';
-  const { prefectureMap, setSelectedPrefecture } = useResasApi(endpoint);
+  const { prefectureMap, setSelectedPrefecture } = useContext(ResasApiContext);
 
-  const handleCheckBox = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleCheckBox = async (event: ChangeEvent<HTMLInputElement>) => {
     const prefCode = event.target.value;
     const checked = event.target.checked;
-    setSelectedPrefecture(parseInt(prefCode), checked);
+    await setSelectedPrefecture(parseInt(prefCode), checked);
   };
 
   const CheckBoxes = [];
