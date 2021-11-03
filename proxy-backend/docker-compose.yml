@@ -1,0 +1,17 @@
+version: '3.0'
+
+services:
+  yumemi-proxy-backend:
+    container_name: yumemi-proxy-backend
+    build: ./
+    image: yumemi-proxy-backend
+    ports:
+      - '8090:8090'
+    env_file:
+      - .env
+    networks:
+      - main-network
+
+networks:
+  main-network:
+    driver: bridge
