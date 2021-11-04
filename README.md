@@ -22,6 +22,10 @@ yarn start
 yarn build
 ```
 
+## Proxy-Backend
+
+To resolve the problem to expose RESAS_API_KEY, I implement Proxy-Backend service in Golang. Proxy-Backend provides Resas API data by proxy. Proxy-Backend is deployed on Google Cloud Run.
+
 ## Tools
 
 ### Language
