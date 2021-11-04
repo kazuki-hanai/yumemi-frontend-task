@@ -4,7 +4,7 @@ services:
   yumemi-proxy-backend:
     container_name: yumemi-proxy-backend
     build: ./
-    image: yumemi-proxy-backend
+    image: asia-northeast1-docker.pkg.dev/hypnotic-bounty-320009/yumemi-frontend-task-repo/proxy-backend
     ports:
       - '8090:8090'
     env_file:
