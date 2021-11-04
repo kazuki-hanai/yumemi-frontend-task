@@ -137,7 +137,13 @@ func (client ResasApiClient) requestToPopulationPerYear(prefCode string, cityCod
 }
 
 func setupCORS(w *http.ResponseWriter, req *http.Request) {
-	(*w).Header().Set("Access-Control-Allow-Origin", "http://localhost:8080")
+	origin := req.Header.Get("Origin")
+
+	if origin != "http://localhost:8080" && origin != "https://wan-nyan-wan.github.io" {
+		return
+	}
+
+	(*w).Header().Set("Access-Control-Allow-Origin", origin)
 	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 }
