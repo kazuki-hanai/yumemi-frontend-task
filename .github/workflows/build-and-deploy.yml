@@ -1,4 +1,4 @@
-name: Build and Test CI
+name: Build and Deploy CI
 on:
   push:
     branches: [main]
