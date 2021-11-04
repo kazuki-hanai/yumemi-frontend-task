@@ -14,13 +14,6 @@ export default {
         ...(process.versions.pnp ? { tsc: 'yarn pnpify tsc' } : {}),
       },
     ],
-    [
-      'snowpack-plugin-baseurl-handler',
-      {
-        exts: ['.html'],
-        baseUrl: '/yumemi-frontend-task',
-      },
-    ],
   ],
   routes: [
     /* Enable an SPA Fallback in development: */
@@ -38,6 +31,6 @@ export default {
     /* ... */
   },
   buildOptions: {
-    /* ... */
+    baseUrl: '/yumemi-frontend-task',
   },
 };
