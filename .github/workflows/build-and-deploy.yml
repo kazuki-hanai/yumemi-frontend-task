@@ -1,0 +1,22 @@
+name: Build and Deploy CI
+on:
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout🛎️
+        uses: actions/checkout@v2
+
+      - name: Install, Lint and Build
+        run: |
+          yarn
+          yarn lint
+          yarn build
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        with:
+          branch: gh-pages
+          folder: build
