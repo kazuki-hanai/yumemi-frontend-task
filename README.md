@@ -1,25 +1,52 @@
-# New Project
+# Yumemi Frontend Task
 
-> ✨ Bootstrapped with Create Snowpack App (CSA).
+This app is SPA(Single Page Application) that displays a graph of total population change by prefecture.
 
-## Available Scripts
+## How to work
 
-### npm start
+### Install dependencies
 
-Runs the app in the development mode.
-Open http://localhost:8080 to view it in the browser.
+```
+yarn install
+```
 
-The page will reload if you make edits.
-You will also see any lint errors in the console.
+### Start
 
-### npm run build
+```
+yarn start
+```
 
-Builds a static copy of your site to the `build/` folder.
-Your app is ready to be deployed!
+### Build
 
-**For the best production performance:** Add a build bundler plugin like "@snowpack/plugin-webpack" to your `snowpack.config.mjs` config file.
+```
+yarn build
+```
 
-### npm test
+## Tools
 
-Launches the application test runner.
-Run with the `--watch` flag (`npm test -- --watch`) to run in interactive watch mode.
+### Language
+
+- TypeScript
+
+### Frontend Framework
+
+- React
+
+### Build & Bundle
+
+- snowpack
+
+### Linter & Formatter
+
+- eslint: Linter
+- prettier: Formatter
+- husky: Hook git commit
+- lint-staged: Run linter against staged git files
+
+### CSS in JS
+
+- @emotion/css: Detach CSS from JSX
+
+### Chart Library
+
+- highcharts
